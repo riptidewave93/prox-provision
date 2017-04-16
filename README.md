@@ -53,7 +53,7 @@ Image Setup
   
     
     nano /etc/prox-provision/settings.conf
-    nano
+    nano /etc/default/prox-provision
     
     
   5. Shutdown instance, convert to template, and test!

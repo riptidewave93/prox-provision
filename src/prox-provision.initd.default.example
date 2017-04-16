@@ -1,0 +1,12 @@
+# Default settings for prox-provision. This file is sourced by /bin/sh from
+# /etc/init.d/prox-provision.
+
+# Enable One-Off mode. This means we run ONCE only and self-remove
+ONEOFF=true
+
+# Define our GIT settings for auto-updating if enabled
+AUTOUPDATE=false
+GIT_USER='gituser'
+GIT_PASSWORD='gitpass'
+GIT_REPO='github.com/user/prox-provision.git'
+GIT_BRANCH='master'

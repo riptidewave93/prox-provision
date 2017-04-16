@@ -1,0 +1,64 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          prox-provision
+# Required-Start:    $network $remote_fs $syslog
+# Required-Stop:     $network $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Configures our instance using the Proxmox API
+# Description:       Configures our instance using the Proxmox API
+### END INIT INFO
+
+# Source our settings file
+if test -f /etc/default/prox-provision; then
+    . /etc/default/prox-provision
+else
+    echo "Error, defaults not defined for prox-provision!"
+    exit 1
+fi
+
+# Wait for net to come up
+sleep 3
+COUNTER=0
+while true; do
+  ping -c 1 8.8.8.8 > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    break
+  else
+    sleep 1
+    let "COUNTER+=1"
+  fi
+  if [ $COUNTER -ge 10 ]; then
+    exit 1 # Error
+  fi
+done
+
+# Clone down the latest version if enabled
+if [ ${AUTOUPDATE} ]; then
+    git clone https://${GIT_USER}:${GIT_PASSWORD}@${GIT_REPO} -b ${GIT_BRANCH} /tmp/prox-provision
+    pip3 install -r /tmp/prox-provision/src/requires.txt
+    mv /tmp/prox-provision/src/prox-provision.py /usr/sbin/prox-provision
+    chmod +x /usr/sbin/src/prox-provision
+    # Early Cleanup
+    rm -rf /tmp/prox-provision
+fi
+
+# If we are configured, run as the script will check for a dup run
+if [ -f "/etc/prox-provision/settings.conf" ]; then
+  # Run time!
+  /usr/sbin/prox-provision > /tmp/prox-provision.log 2>&1
+else
+    echo "Error, prox-provision is not configured!"
+    exit 1
+fi
+
+# Nuke if OneOff run
+if [ ${ONEOFF} ]; then
+    rm -f /etc/default/prox-provision
+    insserv -r /etc/init.d/prox-provision
+    rm -f /etc/init.d/prox-provision
+    rm -f /usr/sbin/prox-provision
+    rm -rf /etc/prox-provision
+    rm -f $0
+fi
+exit 0

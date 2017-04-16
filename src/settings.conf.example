@@ -1,0 +1,12 @@
+# Main Settings file for prox-provision #
+
+[Proxmox]
+# Proxmox Endpoint API Settings
+URL = 10.2.4.4
+User = CloudInit@pve
+Password = InitPW
+
+[User-Data]
+# User Data Settings - Do not change unless you know what you are doing!
+StartFlag = ==USERDATA-START==
+EndFlag = ==USERDATA-END==

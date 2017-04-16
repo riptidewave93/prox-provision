@@ -1,0 +1,5 @@
+netifaces
+openssh_wrapper
+paramiko
+proxmoxer
+requests
